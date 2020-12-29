@@ -6,9 +6,10 @@
  The Basic Workflow:
  * Create or select a song at https://musicboxmaniacs.com/
  * Export it as a DXF file in Grand Illusions 30 format
- * Run the program
+ * Download the python program here by clicking on the green Code button
+ * Run the program by typing in a command window:
  
- python musicbox.py
+ **python musicbox.py**
  
  * Fill in the fields in the dialog box that pops up
    * Input file
@@ -17,3 +18,5 @@
    * Maximum Length of First Strip (Takes into account the length of the leader. Defaults to 11.5 inches, but the actual size depends on how you lay it out in Cricut's Design Space)
    
  The output SVG file is drawn at 72 dpi and contains one group per strip. Each group has a combined path of the circles (notes) and a polyline representing the outline of the strip. Each strip is 2.75 inches wide and variable in length.
+ 
+ Python 3 needs to be installed to run this program. See the help file for details.
