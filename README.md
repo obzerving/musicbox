@@ -3,6 +3,8 @@
 
  This unimaginatively named program converts a DXF file of a music box strip to an SVG file suitable for a Cricut Explore Air 2. It places a leader at the beginning of the strip and, depending on the length of a song, breaks it up into multiple strips. Interlocking tabs are added in the case of multiple strips. It was written to support DXF files created at https://musicboxmaniacs.com/ for a 30-note hand crank music box movement.
  
+ See it in action here: https://youtu.be/y3J86qpPQiQ
+
  The Basic Workflow:
  * Create or select a song at https://musicboxmaniacs.com/
  * Export it as a DXF file in Grand Illusions 30 format
