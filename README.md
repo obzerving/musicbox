@@ -5,14 +5,14 @@
  
  The Basic Workflow:
  * Create or select a song at https://musicboxmaniacs.com/
- * Export it as a DXF file in Grand Illustions 30 format
+ * Export it as a DXF file in Grand Illusions 30 format
  * Run the program
  
- python musicbox.python
+ python musicbox.py
  
  * Fill in the fields in the dialog box that pops up
    * Input file
-   * Output file
+   * Output file (Include the .svg extension in the file name)
    * Length of Leader (defaults to one inch and applies only to the first strip generated)
    * Maximum Length of First Strip (Takes into account the length of the leader. Defaults to 11.5 inches, but the actual size depends on how you lay it out in Cricut's Design Space)
    
