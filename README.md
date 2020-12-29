@@ -1,7 +1,7 @@
 # musicbox
  Creates  strips for 30 note music boxes
 
- This unimaginatively named program converts a DXF file of a music box strip to an SVG file suitable for a Cricut Explore Air 2. It places a leader at the beginning of the strip and, if the length of a song exceeds a specified length, breaks it up into multiple strips. Interlocking tabs are added in the case of multiple strips. It was written to support DXF files created at https://musicboxmaniacs.com/ for a 30-note hand crank music box movement.
+ This unimaginatively named program converts a DXF file of a music box strip to an SVG file suitable for a Cricut Explore Air 2. It places a leader at the beginning of the strip and, depending on the length of a song, breaks it up into multiple strips. Interlocking tabs are added in the case of multiple strips. It was written to support DXF files created at https://musicboxmaniacs.com/ for a 30-note hand crank music box movement.
  
  The Basic Workflow:
  * Create or select a song at https://musicboxmaniacs.com/
