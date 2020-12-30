@@ -118,7 +118,7 @@ def main(argv):
       root.withdraw()
       messagebox.showerror('Program Input Error', 'Output File is Required', parent=root)
       sys.exit(5)
-    maxlength = maxlength - leader
+    maxlength = maxlength - leader -0.25
     bp = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n'+\
 '<svg\n'+\
 '   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n'+\
@@ -259,8 +259,9 @@ def main(argv):
     for circle in circles:
         outf.write(circle)
         outf.write(" ")
-    outf.write('M '+ str(bbx[0]) + ',' + str(bbx[1]) + ' L '+ str(endx+72.0) + ',' + str(bbx[3]) + \
-            ' L '+ str(endx+72.0) + ',' + str(bbx[5]) + ' L '+ str(bbx[6]) + ',' + str(bbx[7]))
+    trailer = leader*svg_scale
+    outf.write('M '+ str(bbx[0]) + ',' + str(bbx[1]) + ' L '+ str(endx+trailer) + ',' + str(bbx[3]) + \
+            ' L '+ str(endx+trailer) + ',' + str(bbx[5]) + ' L '+ str(bbx[6]) + ',' + str(bbx[7]))
     if strip_num > 1:
         outf.write(' L '+ str(bbx[6]) + ',' + str(bbx[7]-8) + ' L '+ str(bbx[6]-10) + ',' + str(bbx[7]-5) + \
             ' L '+ str(bbx[6]-10) + ',' + str(bbx[7]-13) + ' L '+ str(bbx[6]) + ',' + str(bbx[7]-13) + \
