@@ -1,7 +1,7 @@
 ##################################################################################################################
 #                                                                                                                #
 # Music Box Strip Maker                                                                                          #
-# Version 3.0                                                                                                    #
+# Version 4.0                                                                                                    #
 #                                                                                                                #
 # This program converts a DXF file of a music box strip to an SVG file suitable for a Cricut Explore Air 2.      #
 #                                                                                                                #
@@ -118,7 +118,6 @@ def main(argv):
       root.withdraw()
       messagebox.showerror('Program Input Error', 'Output File is Required', parent=root)
       sys.exit(5)
-    maxlength = maxlength - leader -0.25
     bp = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n'+\
 '<svg\n'+\
 '   xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n'+\
@@ -148,12 +147,14 @@ def main(argv):
 '  <g\n'+\
 '     id=\"layer1\" />\n'
     svg_scale = 72.0 # Cricut needs 72 dpi
-    diagonal = -leader*svg_scale # Sets the leader on the first strip
+    header = leader*svg_scale # Sets the leader on the first strip
+    # Centers of notes are offset from their actual locations for multiple strips
     xoffset = 0.0
     yoffset = 0.0
     ymargin = 0.0 # Actual value will be derived later
     ypad = 0.1*svg_scale # distance between strips
     max_strip = maxlength*svg_scale
+    tab_width = 0.25*svg_scale
     opaths = []
     stroke_width = 0.01*svg_scale
     style = '\"fill:#ffffff;stroke:#000000;stroke-width:{0};stroke-miterlimit:4;stroke-dasharray:none\"'.format(stroke_width)
@@ -182,16 +183,15 @@ def main(argv):
     for e in msp.query('POLYLINE'):
         if ymargin == 0.0:  # We're looking for the strip boundary
             for pp in e.points():
-                if (pp[0]==0.0) and (pp[1]==0.0):  # This is the strip boundary.
-                    bbx.append(diagonal)  # Put a diagonal leader on the first one. Save the bounding box for later (ASSUMES X CHANGES FIRST in CW direction)
-                    bbx.append(pp[1]*svg_scale)
-                    strip_bbx = True
+                if (pp[0]==0.0) and (pp[1]==0.0):
+                    strip_bbx = True # This is the strip boundary. Capture it
+                    bbx.append(pp[0])
+                    bbx.append(pp[1])
                 else:
                     if strip_bbx:
                         bbx.append(pp[0]*svg_scale)
                         bbx.append(pp[1]*svg_scale)
             ymargin = bbx[5] - bbx[3]
-            bbx[6] = diagonal/2.0 # extend the bottom leader, too
     notes = [] # store the notes here
     note_radius = 0.0 # the radius will always be the same
     for e in msp.query('CIRCLE'):
@@ -202,13 +202,13 @@ def main(argv):
     circles = []
     for note in notes:
         rad = note_radius*svg_scale
-        cx = note[0]*svg_scale + xoffset
+        cx = note[0]*svg_scale + xoffset # Notes start after leader (applies to first strip only)
         cy = note[1]*svg_scale + yoffset
         startx = cx - rad
         starty = cy
         endx = cx + rad
         endy = cy
-        if (endx + stroke_width) > max_strip:  # end the current strip
+        if (endx + stroke_width + (strip_num > 1)*tab_width + (strip_num == 1)*header) > max_strip:  # end the current strip
             outf.write('     <g\n       id=\"g'+str(group_num)+'\">\n')
             outf.write('         <path\n           id=\"'+str(strip_num)+str(group_num)+'\"\n           style='+style+\
                        '\n           d=\"')
@@ -216,13 +216,14 @@ def main(argv):
                 outf.write(circle)
                 outf.write(" ")
             breakx = (last_endx + startx)/2.0 # find the break point (ASSUMES X CHANGES FIRST in CW direction)
-            outf.write('M '+ str(bbx[0]) + ',' + str(bbx[1]) + ' L '+ str(breakx) + ',' + str(bbx[3]) + \
+            # We include interlocking tab cutout at the end
+            outf.write('M '+ str(bbx[0]-(strip_num == 1)*header) + ',' + str(bbx[1]) + ' L '+ str(breakx) + ',' + str(bbx[3]) + \
                     ' L '+ str(breakx) + ',' + str(bbx[3]+8) + ' L '+ str(breakx-10) + ',' + str(bbx[3]+5) + \
                     ' L '+ str(breakx-10) + ',' + str(bbx[3]+13) + ' L '+ str(breakx) + ',' + str(bbx[3]+13) + \
                     ' L '+ str(breakx) + ',' + str(bbx[5]-13) + ' L '+ str(breakx-10) + ',' + str(bbx[5]-13) + \
                     ' L '+ str(breakx-10) + ',' + str(bbx[5]-5) + ' L '+ str(breakx) + ',' + str(bbx[5]-8) + \
-                    ' L '+ str(breakx) + ',' + str(bbx[5]) + ' L '+ str(bbx[6]) + ',' + str(bbx[7]))
-            if strip_num > 1:
+                    ' L '+ str(breakx) + ',' + str(bbx[5]) + ' L '+ str(bbx[6]-(strip_num == 1)*header/2) + ',' + str(bbx[7]))
+            if strip_num > 1: # We add an interlocking tab to the beginning of the strip if it is not the first one
                 outf.write(' L '+ str(bbx[6]) + ',' + str(bbx[7]-8) + ' L '+ str(bbx[6]-10) + ',' + str(bbx[7]-5) + \
                     ' L '+ str(bbx[6]-10) + ',' + str(bbx[7]-13) + ' L '+ str(bbx[6]) + ',' + str(bbx[7]-13) + \
                     ' L '+ str(bbx[0]) + ',' + str(bbx[1]+13) + ' L '+ str(bbx[0]-10) + ',' + str(bbx[1]+13) + \
@@ -239,12 +240,12 @@ def main(argv):
             strip_num = strip_num + 1
             group_num = group_num + 1
             circles.clear()
-        cx = note[0]*svg_scale + xoffset
-        cy = note[1]*svg_scale + yoffset
-        startx = cx - rad
-        starty = cy
-        endx = cx + rad
-        endy = cy
+            cx = note[0]*svg_scale + xoffset
+            cy = note[1]*svg_scale + yoffset
+            startx = cx - rad
+            starty = cy
+            endx = cx + rad
+            endy = cy
         last_endx = endx
         d = 'M '+str(endx)+','+str(endy)
         d = d +' A '+str(rad)+','+str(rad)+' 0 0 1 '+str(endx-rad)+','+str(endy+rad)
@@ -259,7 +260,9 @@ def main(argv):
     for circle in circles:
         outf.write(circle)
         outf.write(" ")
-    trailer = leader*svg_scale
+    trailer = header
+    if (trailer + endx + stroke_width + (strip_num > 1)*tab_width) > max_strip:
+        trailer = max_strip - endx  - stroke_width - (strip_num > 1)*tab_width
     outf.write('M '+ str(bbx[0]) + ',' + str(bbx[1]) + ' L '+ str(endx+trailer) + ',' + str(bbx[3]) + \
             ' L '+ str(endx+trailer) + ',' + str(bbx[5]) + ' L '+ str(bbx[6]) + ',' + str(bbx[7]))
     if strip_num > 1:
